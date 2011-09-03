@@ -1812,6 +1812,15 @@ class UnitOfWork implements PropertyChangedListener
      */
     public function clear()
     {
+        foreach($this->identityMap as $className => $entities) {
+            $class = $this->em->getClassMetadata($className);
+            if (isset($class->lifecycleCallbacks[Events::onClear])) {
+                foreach($entities as $entity) {
+                    $class->invokeLifecycleCallbacks(Events::onClear, $entity);
+                }
+            }
+        }
+
         $this->identityMap =
         $this->entityIdentifiers =
         $this->originalEntityData =
